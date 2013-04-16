@@ -1,0 +1,33 @@
+<!-- The COPYRIGHT file at the top level of this repository contains the full
+copyright notices and license terms. -->
+<tryton>
+    <data>
+        <record model="ir.ui.view" id="account_payment_type_view_form">
+            <field name="model">account.payment.type</field>
+            <field name="type">form</field>
+            <field name="inherit"
+                ref="account_payment_type.account_payment_type_view_form"/>
+            <field name="name">payment_type_form</field>
+        </record>
+        <record model="ir.action.act_window" id="act_invoice_moves">
+            <field name="name">Moves</field>
+            <field name="res_model">account.move</field>
+            <field name="domain">[('origin', '=', ('account.invoice', Eval('active_id')))]</field>
+        </record>
+        <record model="ir.action.keyword" id="keyword_invoice_moves">
+            <field name="keyword">form_relate</field>
+            <field name="model">account.invoice,-1</field>
+            <field name="action" ref="act_invoice_moves"/>
+        </record>
+        <record model="ir.action.act_window" id="act_invoice_move_lines">
+            <field name="name">Move Lines</field>
+            <field name="res_model">account.move.line</field>
+            <field name="domain">[('move.origin', '=', ('account.invoice', Eval('active_id')))]</field>
+        </record>
+        <record model="ir.action.keyword" id="keyword_invoice_move_lines">
+            <field name="keyword">form_relate</field>
+            <field name="model">account.invoice,-1</field>
+            <field name="action" ref="act_invoice_move_lines"/>
+        </record>
+    </data>
+</tryton>
