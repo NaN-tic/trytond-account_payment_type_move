@@ -71,6 +71,8 @@ class Move(ModelSQL, ModelView):
     @ModelView.button
     def post(cls, moves):
         super(Move, cls).post(moves)
+        # Avoid infinite recursion by setting and checking for a
+        # 'payment_type_move' in context
         if Transaction().context.get('payment_type_move', True):
             with Transaction().set_context(payment_type_move=False):
                 cls.create_payment_auto_move(moves)
