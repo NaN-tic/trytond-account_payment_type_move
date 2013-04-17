@@ -84,7 +84,7 @@ class Invoice(ModelSQL, ModelView):
         if self.type in ('out_invoice', 'out_credit_note'):
             kind = 'receivable'
         else:
-            kind = 'receivable'
+            kind = 'payable'
         lines = Line.search([
                 ('origin', '=', ('account.invoice', self.id)),
                 ('account.kind', '=', kind),
