@@ -5,7 +5,7 @@ import os
 import ConfigParser
 
 MODULE = 'account_payment_type_move'
-PREFIX = 'nantic'
+PREFIX = 'trytonspain'
 MODULE2PREFIX = {}
 
 
