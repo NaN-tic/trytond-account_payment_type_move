@@ -1,23 +1,23 @@
 #This file is part of account_payment_type_move module for Tryton.
 #The COPYRIGHT file at the top level of this repository contains
 #the full copyright notices and license terms.
-
 from itertools import izip
-from trytond.model import ModelView, ModelSQL, fields
-from trytond.pool import Pool
+from trytond.model import ModelView, fields
+from trytond.pool import Pool, PoolMeta
 from trytond.transaction import Transaction
 
 __all__ = ['PaymentType', 'Move', 'Invoice']
+__metaclass__ = PoolMeta
 
 
-class PaymentType(ModelSQL, ModelView):
+class PaymentType:
     __name__ = 'account.payment.type'
-
     account_receivable = fields.Many2One('account.account',
         'Receivable Account')
     account_payable = fields.Many2One('account.account', 'Payable Account')
 
-class Move(ModelSQL, ModelView):
+
+class Move:
     __name__ = 'account.move'
 
     @classmethod
@@ -78,7 +78,7 @@ class Move(ModelSQL, ModelView):
                 cls.create_payment_auto_move(moves)
 
 
-class Invoice(ModelSQL, ModelView):
+class Invoice:
     __name__ = 'account.invoice'
 
     def get_lines_to_pay(self, name):
