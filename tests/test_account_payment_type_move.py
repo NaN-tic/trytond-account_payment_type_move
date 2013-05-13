@@ -133,6 +133,7 @@ class AccountPaymentTypeMoveTestCase(unittest.TestCase):
                 context=CONTEXT) as transaction:
             self.payment_type.create([{
                         'name': 'Transfer',
+                        'kind': 'receivable',
                         }])
             root, = self.account.search([('parent', '=', None)])
             type_ = self.account_type.search([])[0]
@@ -145,14 +146,15 @@ class AccountPaymentTypeMoveTestCase(unittest.TestCase):
                         }])
             self.payment_type.create([{
                         'name': 'Receipt',
-                        'account_receivable': account.id,
+                        'account': account.id,
+                        'kind': 'receivable',
                         }])
             transaction.cursor.commit()
 
     def test0040payment_term(self):
         with Transaction().start(DB_NAME, USER,
                 context=CONTEXT) as transaction:
-            
+
             cu1, = self.currency.create([{
                         'name': 'cu1',
                         'symbol': 'cu1',

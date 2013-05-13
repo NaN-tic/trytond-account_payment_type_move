@@ -1,9 +1,7 @@
 <?xml version="1.0"?>
 <data>
     <xpath expr="/form/field[@name='code']" position="after">
-        <label name="account_receivable"/>
-        <field name="account_receivable"/>
-        <label name="account_payable"/>
-        <field name="account_payable"/>
+        <label name="account"/>
+        <field name="account"/>
     </xpath>
 </data>

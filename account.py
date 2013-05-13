@@ -12,9 +12,10 @@ __metaclass__ = PoolMeta
 
 class PaymentType:
     __name__ = 'account.payment.type'
-    account_receivable = fields.Many2One('account.account',
-        'Receivable Account')
-    account_payable = fields.Many2One('account.account', 'Payable Account')
+    account = fields.Many2One('account.account', 'Account', help='If set, once '
+        'a move with this payment type will be confirmed, a new move will be '
+        'created that will move the balance from the payable/receivable to the '
+        'account supplied here.')
 
 
 class Move:
@@ -30,8 +31,7 @@ class Move:
                         or line.account.kind not in ('receivable', 'payable')
                         ):
                     continue
-                account = getattr(line.payment_type,
-                    'account_%s' % line.account.kind)
+                account = line.payment_type.account
                 if not account or account == line.account:
                     continue
                 to_reconcile.append(line)
@@ -57,9 +57,7 @@ class Move:
                 new_line.debit = line.credit
                 new_line.credit = line.debit
                 new_line.save()
-                account = getattr(line.payment_type,
-                    'account_%s' % line.account.kind)
-                counterpart.account = account
+                counterpart.account = line.payment_type.account
                 counterpart.save()
                 to_reconcile2.append((line, new_line))
 
