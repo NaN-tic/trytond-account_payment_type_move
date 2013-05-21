@@ -21,6 +21,19 @@ class PaymentType:
 class Move:
     __name__ = 'account.move'
 
+    def auto_move_line_defaults(self):
+        return {
+            'move': self.id,
+            'tax_lines': [],
+            'payment_type': None,
+            }
+
+    def auto_move_counterpart_defaults(self):
+        return {
+            'move': self.id,
+            'tax_lines': [],
+            }
+
     @classmethod
     def create_payment_auto_move(cls, moves):
         Line = Pool().get('account.move.line')
@@ -44,13 +57,10 @@ class Move:
             new_move.origin = move.origin
             new_move.description = move.description
             new_move.save()
-            new_lines = Line.copy(to_reconcile, {
-                    'payment_type': None,
-                    'move': new_move.id,
-                    })
-            counterparts = Line.copy(to_reconcile, {
-                    'move': new_move.id,
-                    })
+            new_lines = Line.copy(to_reconcile,
+                new_move.auto_move_line_defaults())
+            counterparts = Line.copy(to_reconcile,
+                new_move.auto_move_counterpart_defaults())
             to_reconcile2 = []
             for line, new_line, counterpart in izip(to_reconcile, new_lines,
                     counterparts):
