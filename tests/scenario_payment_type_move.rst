@@ -208,7 +208,7 @@ Create invoices::
     >>> line.product = product
     >>> line.quantity = 1
     >>> invoice_receipt.save()
-    >>> invoice_receipt.total_amount == Decimal(55)
+    >>> invoice_receipt.total_amount == Decimal('55.0')
     True
     >>> invoice_transfer = Invoice()
     >>> invoice_transfer.party = party
@@ -219,7 +219,7 @@ Create invoices::
     >>> line.product = product
     >>> line.quantity = 1
     >>> invoice_transfer.save()
-    >>> invoice_transfer.total_amount == Decimal(55)
+    >>> invoice_transfer.total_amount == Decimal('55.0')
     True
     >>> Invoice.post([invoice_receipt.id, invoice_transfer.id], config.context)
     >>> invoice_receipt.reload()
@@ -234,9 +234,9 @@ Check and reconcile::
     >>> Move = Model.get('account.move')
     >>> MoveLine = Model.get('account.move.line')
     >>> Reconciliation = Model.get('account.move.reconciliation')
-    >>> invoice_transfer.amount_to_pay == Decimal('55')
+    >>> invoice_transfer.amount_to_pay == Decimal('55.0')
     True
-    >>> invoice_receipt.amount_to_pay == Decimal('55')
+    >>> invoice_receipt.amount_to_pay == Decimal('55.0')
     True
     >>> move = Move(journal=invoice_receipt.journal.id)
     >>> move.save()
