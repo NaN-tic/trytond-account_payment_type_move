@@ -11,14 +11,10 @@ DIR = os.path.abspath(os.path.normpath(os.path.join(__file__,
 if os.path.isdir(DIR):
     sys.path.insert(0, os.path.dirname(DIR))
 
-import datetime
-from decimal import Decimal
 import unittest
 import doctest
 import trytond.tests.test_tryton
-from trytond.transaction import Transaction
 from trytond.tests.test_tryton import test_view, test_depends
-from trytond.tests.test_tryton import POOL, DB_NAME, USER, CONTEXT
 from trytond.backend.sqlite.database import Database as SQLiteDatabase
 
 
