@@ -98,5 +98,6 @@ class Invoice:
         lines = Line.search([
                 ('origin', '=', ('account.invoice', self.id)),
                 ('account.kind', '=', kind),
+                ('maturity_date', '=', None),
                 ])
         return [x.id for x in lines]
