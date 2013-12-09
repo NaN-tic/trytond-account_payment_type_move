@@ -12,10 +12,10 @@ __metaclass__ = PoolMeta
 
 class PaymentType:
     __name__ = 'account.payment.type'
-    account = fields.Many2One('account.account', 'Account', help='If set, once '
-        'a move with this payment type will be confirmed, a new move will be '
-        'created that will move the balance from the payable/receivable to the '
-        'account supplied here.')
+    account = fields.Many2One('account.account', 'Account', help='If set, '
+        'once a move with this payment type will be confirmed, a new move '
+        'will be created that will move the balance from the '
+        'payable/receivable to the account supplied here.')
 
 
 class Move:
@@ -41,8 +41,7 @@ class Move:
             to_reconcile = []
             for line in move.lines:
                 if (not line.payment_type
-                        or line.account.kind not in ('receivable', 'payable')
-                        ):
+                        or line.account.kind not in ('receivable', 'payable')):
                     continue
                 account = line.payment_type.account
                 if not account or account == line.account:
@@ -98,6 +97,6 @@ class Invoice:
         lines = Line.search([
                 ('origin', '=', ('account.invoice', self.id)),
                 ('account.kind', '=', kind),
-                ('maturity_date', '=', None),
+                ('maturity_date', '!=', None),
                 ])
         return [x.id for x in lines]
