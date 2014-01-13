@@ -1,0 +1,25 @@
+# 
+msgid ""
+msgstr "Content-Type: text/plain; charset=utf-8\n"
+
+msgctxt "field:account.payment.type,account:"
+msgid "Account"
+msgstr "Cuenta"
+
+msgctxt "help:account.payment.type,account:"
+msgid ""
+"If set, once a move with this payment type will be confirmed, a new move "
+"will be created that will move the balance from the payable/receivable to "
+"the account supplied here."
+msgstr ""
+"Si se marca, cuando un asentamiento con este tipo de pago se confirme se "
+"creará un nuevo asentamiento que moverá el balance de la cuenta a "
+"pagar/cobrar a la cuenta definida aquí."
+
+msgctxt "model:ir.action,name:act_invoice_move_lines"
+msgid "Move Lines"
+msgstr "Apuntes"
+
+msgctxt "model:ir.action,name:act_invoice_moves"
+msgid "Moves"
+msgstr "Asentamientos"
