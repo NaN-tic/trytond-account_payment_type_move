@@ -1,9 +1,13 @@
-#This file is part of account_payment_type_move module for Tryton.
-#The COPYRIGHT file at the top level of this repository contains
-#the full copyright notices and license terms.
+# This file is part of account_payment_type_move module for Tryton.
+# The COPYRIGHT file at the top level of this repository contains
+# the full copyright notices and license terms.
+from sql import Cast
+from sql.operators import Concat
+from sql.conditionals import Case
 from itertools import izip
 from trytond.model import ModelView, fields
 from trytond.pool import Pool, PoolMeta
+from trytond.tools import grouped_slice, reduce_ids
 from trytond.transaction import Transaction
 
 __all__ = ['PaymentType', 'Move', 'Invoice']
@@ -65,8 +69,12 @@ class Move:
                     counterparts):
                 new_line.debit = line.credit
                 new_line.credit = line.debit
+                if not line.account.party_required:
+                    line.party = None
                 new_line.save()
                 counterpart.account = line.payment_type.account
+                if not counterpart.account.party_required:
+                    counterpart.party = None
                 counterpart.save()
                 to_reconcile2.append((line, new_line))
 
@@ -88,15 +96,37 @@ class Move:
 class Invoice:
     __name__ = 'account.invoice'
 
-    def get_lines_to_pay(self, name):
-        Line = Pool().get('account.move.line')
-        if self.type in ('out_invoice', 'out_credit_note'):
-            kind = 'receivable'
-        else:
-            kind = 'payable'
-        lines = Line.search([
-                ('origin', '=', ('account.invoice', self.id)),
-                ('account.kind', '=', kind),
-                ('maturity_date', '!=', None),
-                ])
-        return [x.id for x in lines]
+    @classmethod
+    def get_lines_to_pay(cls, invoices, name):
+        pool = Pool()
+        Move = pool.get('account.move')
+        Line = pool.get('account.move.line')
+        Account = pool.get('account.account')
+        line = Line.__table__()
+        account = Account.__table__()
+        move = Move.__table__()
+        invoice = cls.__table__()
+        cursor = Transaction().cursor
+        _, origin_type = Move.origin.sql_type()
+
+        lines = super(Invoice, cls).get_lines_to_pay(invoices, name)
+        for sub_ids in grouped_slice(invoices):
+            red_sql = reduce_ids(invoice.id, sub_ids)
+            query = invoice.join(move,
+                condition=((move.origin == Concat('account.invoice,',
+                                Cast(invoice.id, origin_type))))
+                    ).join(line, condition=(line.move == move.id)
+                    ).join(account, condition=(
+                        (line.account == account.id) &
+                        Case((invoice.type.in_(
+                                ['out_invoice', 'out_credit_note']),
+                            account.kind == 'receivable'),
+                            else_=account.kind == 'payable'))).select(
+                    invoice.id, line.id,
+                    where=(line.maturity_date != None) & red_sql,
+                    order_by=(invoice.id, line.maturity_date))
+            cursor.execute(*query)
+            for invoice_id, line_id in cursor.fetchall():
+                if not line_id in lines[invoice_id]:
+                    lines[invoice_id].append(line_id)
+        return lines
