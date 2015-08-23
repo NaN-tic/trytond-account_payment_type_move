@@ -12,7 +12,9 @@ copyright notices and license terms. -->
         <record model="ir.action.act_window" id="act_invoice_moves">
             <field name="name">Moves</field>
             <field name="res_model">account.move</field>
-            <field name="domain">[('origin', '=', ('account.invoice', Eval('active_id')))]</field>
+            <field name="domain"
+                eval="[('origin', '=', ('account.invoice', Eval('active_id')))]"
+                pyson="1"/>
         </record>
         <record model="ir.action.keyword" id="keyword_invoice_moves">
             <field name="keyword">form_relate</field>
@@ -22,7 +24,9 @@ copyright notices and license terms. -->
         <record model="ir.action.act_window" id="act_invoice_move_lines">
             <field name="name">Move Lines</field>
             <field name="res_model">account.move.line</field>
-            <field name="domain">[('move.origin', '=', ('account.invoice', Eval('active_id')))]</field>
+            <field name="domain"
+                eval="[('move.origin', '=', ('account.invoice', Eval('active_id')))]"
+                pyson="1"/>
         </record>
         <record model="ir.action.keyword" id="keyword_invoice_move_lines">
             <field name="keyword">form_relate</field>
