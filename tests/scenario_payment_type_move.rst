@@ -18,11 +18,11 @@ Create database::
 
 Install account_invoice::
 
-    >>> Module = Model.get('ir.module.module')
+    >>> Module = Model.get('ir.module')
     >>> account_invoice_module, = Module.find(
     ...     [('name', '=', 'account_payment_type_move')])
     >>> Module.install([account_invoice_module.id], config.context)
-    >>> Wizard('ir.module.module.install_upgrade').execute('upgrade')
+    >>> Wizard('ir.module.install_upgrade').execute('upgrade')
 
 Create company::
 
