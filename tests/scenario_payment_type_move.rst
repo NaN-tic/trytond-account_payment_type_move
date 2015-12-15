@@ -54,6 +54,7 @@ Create chart of accounts::
     >>> receivable = accounts['receivable']
     >>> revenue = accounts['revenue']
     >>> expense = accounts['expense']
+    >>> cash = accounts['cash']
 
 Create tax::
 
@@ -90,20 +91,20 @@ Create payment term::
 
     >>> PaymentTerm = Model.get('account.invoice.payment_term')
     >>> payment_term = PaymentTerm(name='Term')
-    >>> line = payment_term.lines.new(type='percent', percentage=Decimal(50))
-    >>> delta = line.relativedeltas.new(days=20)
+    >>> line = payment_term.lines.new(type='percent', percentage=Decimal(25))
+    >>> delta = line.relativedeltas.new(months=1)
     >>> line = payment_term.lines.new(type='remainder')
-    >>> delta = line.relativedeltas.new(days=40)
+    >>> delta = line.relativedeltas.new(months=2)
     >>> payment_term.save()
 
 Create payment type::
 
+    >>> Account = Model.get('account.account')
     >>> PaymentType = Model.get('account.payment.type')
     >>> AccountType = Model.get('account.account.type')
     >>> transfer = PaymentType(name='Transfer', kind='receivable')
     >>> transfer.save()
-    >>> receivable2_type = AccountType.find([])[0]
-    >>> receivable2_type.save()
+    >>> receivable2_type, = AccountType.find([], limit=1)
     >>> receivable2 = Account(name='Receivable 2', kind='receivable',
     ...    type=receivable2_type, reconcile=True)
     >>> receivable2.save()
@@ -119,29 +120,28 @@ Create invoices::
     >>> invoice_receipt.party = party
     >>> invoice_receipt.payment_term = payment_term
     >>> invoice_receipt.payment_type = receipt
-    >>> line = InvoiceLine()
-    >>> invoice_receipt.lines.append(line)
+    >>> line = invoice_receipt.lines.new()
     >>> line.product = product
     >>> line.quantity = 1
+    >>> line.unit_price = Decimal('50.0')
     >>> invoice_receipt.save()
-    >>> invoice_receipt.total_amount == Decimal('55.0')
-    True
+    >>> invoice_receipt.total_amount
+    Decimal('55.00')
+    >>> invoice_receipt.click('post')
+    >>> invoice_receipt.state
+    u'posted'
     >>> invoice_transfer = Invoice()
     >>> invoice_transfer.party = party
     >>> invoice_transfer.payment_term = payment_term
     >>> invoice_transfer.payment_type = transfer
-    >>> line = InvoiceLine()
-    >>> invoice_transfer.lines.append(line)
+    >>> line = invoice_transfer.lines.new()
     >>> line.product = product
     >>> line.quantity = 1
+    >>> line.unit_price = Decimal('50.0')
     >>> invoice_transfer.save()
-    >>> invoice_transfer.total_amount == Decimal('55.0')
-    True
-    >>> Invoice.post([invoice_receipt.id, invoice_transfer.id], config.context)
-    >>> invoice_receipt.reload()
-    >>> invoice_transfer.reload()
-    >>> invoice_receipt.state
-    u'posted'
+    >>> invoice_transfer.total_amount
+    Decimal('55.00')
+    >>> invoice_transfer.click('post')
     >>> invoice_transfer.state
     u'posted'
 
@@ -150,18 +150,18 @@ Check and reconcile::
     >>> Move = Model.get('account.move')
     >>> MoveLine = Model.get('account.move.line')
     >>> Reconciliation = Model.get('account.move.reconciliation')
-    >>> invoice_transfer.amount_to_pay == Decimal('55.0')
-    True
-    >>> invoice_receipt.amount_to_pay == Decimal('55.0')
-    True
+    >>> invoice_transfer.amount_to_pay
+    Decimal('55.00')
+    >>> invoice_receipt.amount_to_pay
+    Decimal('55.00')
     >>> move = Move(journal=invoice_receipt.journal.id)
     >>> move.save()
-    >>> line = MoveLine(move=move.id, account=cash.id, debit=Decimal('41.25'))
-    >>> line.save()
-    >>> line = MoveLine(move=move.id, account=receivable2.id,
-    ...     credit=Decimal('41.25'))
-    >>> line.save()
-    >>> Move.post([move.id], config.context)
+    >>> line = move.lines.new(account=cash.id, debit=Decimal('41.25'))
+    >>> line = move.lines.new(account=receivable2.id, credit=Decimal('41.25'))
+    >>> move.click('post')
+    >>> line, _ = move.lines
+    >>> line.credit
+    Decimal('41.25')
     >>> lines_to_reconcile = MoveLine.find([
     ...         ('account', '=', receivable2.id),
     ...         ('move.state', '=', 'posted'),
@@ -175,5 +175,5 @@ Check and reconcile::
     >>> reconcile_lines.state == 'end'
     True
     >>> invoice_receipt.reload()
-    >>> invoice_receipt.amount_to_pay == Decimal('13.75')
-    True
+    >>> invoice_receipt.amount_to_pay
+    Decimal('13.75')
