@@ -11,10 +11,10 @@ from trytond.tools import grouped_slice, reduce_ids
 from trytond.transaction import Transaction
 
 __all__ = ['PaymentType', 'Move', 'Invoice']
-__metaclass__ = PoolMeta
 
 
 class PaymentType:
+    __metaclass__ = PoolMeta
     __name__ = 'account.payment.type'
     account = fields.Many2One('account.account', 'Account', help='If set, '
         'once a move with this payment type will be confirmed, a new move '
@@ -23,6 +23,7 @@ class PaymentType:
 
 
 class Move:
+    __metaclass__ = PoolMeta
     __name__ = 'account.move'
 
     def auto_move_line_defaults(self):
@@ -94,6 +95,7 @@ class Move:
 
 
 class Invoice:
+    __metaclass__ = PoolMeta
     __name__ = 'account.invoice'
 
     @classmethod
