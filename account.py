@@ -108,7 +108,7 @@ class Invoice:
         account = Account.__table__()
         move = Move.__table__()
         invoice = cls.__table__()
-        cursor = Transaction().cursor
+        cursor = Transaction().connection.cursor()
         _, origin_type = Move.origin.sql_type()
 
         lines = super(Invoice, cls).get_lines_to_pay(invoices, name)
