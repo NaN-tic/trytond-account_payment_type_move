@@ -10,7 +10,9 @@ import ConfigParser
 
 MODULE = 'account_payment_type_move'
 PREFIX = 'trytonspain'
-MODULE2PREFIX = {}
+MODULE2PREFIX = {
+    'account_payment_type': 'trytonspain',
+    }
 
 
 def read(fname):
