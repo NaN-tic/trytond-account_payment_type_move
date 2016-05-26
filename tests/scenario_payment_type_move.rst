@@ -89,12 +89,7 @@ Create product::
 
 Create payment term::
 
-    >>> PaymentTerm = Model.get('account.invoice.payment_term')
-    >>> payment_term = PaymentTerm(name='Term')
-    >>> line = payment_term.lines.new(type='percent', percentage=Decimal(25))
-    >>> delta = line.relativedeltas.new(months=1)
-    >>> line = payment_term.lines.new(type='remainder')
-    >>> delta = line.relativedeltas.new(months=2)
+    >>> payment_term = create_payment_term()
     >>> payment_term.save()
 
 Create payment type::
@@ -119,11 +114,11 @@ Create invoices::
     >>> invoice_receipt = Invoice()
     >>> invoice_receipt.party = party
     >>> invoice_receipt.payment_term = payment_term
-    >>> invoice_receipt.payment_type = receipt
     >>> line = invoice_receipt.lines.new()
     >>> line.product = product
     >>> line.quantity = 1
     >>> line.unit_price = Decimal('50.0')
+    >>> invoice_receipt.payment_type = receipt
     >>> invoice_receipt.save()
     >>> invoice_receipt.total_amount
     Decimal('55.00')
@@ -133,11 +128,11 @@ Create invoices::
     >>> invoice_transfer = Invoice()
     >>> invoice_transfer.party = party
     >>> invoice_transfer.payment_term = payment_term
-    >>> invoice_transfer.payment_type = transfer
     >>> line = invoice_transfer.lines.new()
     >>> line.product = product
     >>> line.quantity = 1
     >>> line.unit_price = Decimal('50.0')
+    >>> invoice_transfer.payment_type = transfer
     >>> invoice_transfer.save()
     >>> invoice_transfer.total_amount
     Decimal('55.00')
