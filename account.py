@@ -41,15 +41,20 @@ class Move:
 
     @classmethod
     def create_payment_auto_move(cls, moves):
-        Line = Pool().get('account.move.line')
+        pool = Pool()
+        Line = pool.get('account.move.line')
+        to_post = []
         for move in moves:
+            if not move.origin or not hasattr(move.origin, 'payment_type'):
+                continue
+            account = move.origin.payment_type.account
+            if not account:
+                continue
             to_reconcile = []
             for line in move.lines:
-                if (not line.payment_type
-                        or line.account.kind not in ('receivable', 'payable')):
+                if line.account.kind not in ('receivable', 'payable'):
                     continue
-                account = line.payment_type.account
-                if not account or account == line.account:
+                if account == line.account:
                     continue
                 to_reconcile.append(line)
             if not to_reconcile:
@@ -73,15 +78,16 @@ class Move:
                 if not line.account.party_required:
                     line.party = None
                 new_line.save()
-                counterpart.account = line.payment_type.account
+                counterpart.account = account
                 if not counterpart.account.party_required:
                     counterpart.party = None
                 counterpart.save()
                 to_reconcile2.append((line, new_line))
 
-            cls.post([new_move])
             for l1, l2 in to_reconcile2:
                 Line.reconcile([l1, l2])
+            to_post.append(new_move)
+        cls.post(to_post)
 
     @classmethod
     @ModelView.button
