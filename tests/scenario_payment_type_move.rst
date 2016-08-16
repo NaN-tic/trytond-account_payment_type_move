@@ -171,4 +171,4 @@ Check and reconcile::
     True
     >>> invoice_receipt.reload()
     >>> invoice_receipt.amount_to_pay
-    Decimal('0.0)
+    Decimal('0.0')
