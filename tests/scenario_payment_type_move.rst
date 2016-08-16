@@ -151,16 +151,16 @@ Check and reconcile::
     Decimal('55.00')
     >>> move = Move(journal=invoice_receipt.journal.id)
     >>> move.save()
-    >>> line = move.lines.new(account=cash.id, debit=Decimal('41.25'))
-    >>> line = move.lines.new(account=receivable2.id, credit=Decimal('41.25'))
+    >>> line = move.lines.new(account=cash.id, debit=Decimal('55.00'))
+    >>> line = move.lines.new(account=receivable2.id, credit=Decimal('55.00'))
     >>> move.click('post')
     >>> line, _ = move.lines
     >>> line.credit
-    Decimal('41.25')
+    Decimal('55.00')
     >>> lines_to_reconcile = MoveLine.find([
     ...         ('account', '=', receivable2.id),
     ...         ('move.state', '=', 'posted'),
-    ...         ('debit', '=', Decimal('41.25')),
+    ...         ('debit', '=', Decimal('55.00')),
     ...         ])
     >>> lines_to_reconcile.append(line)
     >>> len(lines_to_reconcile)
@@ -171,4 +171,4 @@ Check and reconcile::
     True
     >>> invoice_receipt.reload()
     >>> invoice_receipt.amount_to_pay
-    Decimal('13.75')
+    Decimal('0.0)
